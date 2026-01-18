@@ -25,6 +25,8 @@ export default function LanguageSelector({ value, onChange }: LanguageSelectorPr
         <option value="ar">Arabic (العربية)</option>
         <option value="hi">Hindi (हिन्दी)</option>
         <option value="gu">Gujarati (ગુજરાતી)</option>
+          <option value="ht">Haitian Creole</option>
+          <option value="mr">Marathi</option>
       </select>
     </div>
   );
