@@ -17,6 +17,20 @@ export default function PolyglotMirror() {
     const [transcript, setTranscript] = useState<string>("");
     const [targetLanguage, setTargetLanguage] = useState<string>("es");
 
+    const defaultGreetings: Record<string, string> = {
+        es: "¡Hola!",
+        fr: "Bonjour!",
+        de: "Hallo!",
+        it: "Ciao!",
+        pt: "Olá!",
+        ja: "こんにちは！",
+        ko: "안녕하세요!",
+        zh: "你好！",
+        ar: "مرحبا!",
+        hi: "नमस्ते!",
+        gu: "નમસ્તે!"
+    };
+
     // Custom hooks for speech and translation
     const { translatedText, translate } = useTranslation(targetLanguage);
     const { isListening, toggleListening } = useSpeechRecognition((text) => {
@@ -54,7 +68,8 @@ export default function PolyglotMirror() {
                 const results = landmarkerRef.current.detectForVideo(videoRef.current, performance.now());
                 if (results.faceLandmarks && results.faceLandmarks.length > 0) {
                     const mouth = results.faceLandmarks[0][13];
-                    setMouthPos({ x: mouth.x, y: mouth.y });
+                    // Mirror the x-coordinate to match the mirrored video
+                    setMouthPos({ x: 1 - mouth.x, y: mouth.y });
                 }
             }
             requestRef.current = requestAnimationFrame(predict);
@@ -67,7 +82,9 @@ export default function PolyglotMirror() {
     }, []);
 
     // Bubble shows translation when listening, default text otherwise
-    const bubbleText = isListening && translatedText ? translatedText : "કેમ છો?";
+    const bubbleText = isListening && translatedText
+        ? translatedText
+        : defaultGreetings[targetLanguage] || "Hello!";
 
     return (
         <div className="relative w-screen h-screen bg-black overflow-hidden">
@@ -84,7 +101,7 @@ export default function PolyglotMirror() {
             <div className="absolute inset-0 z-20 pointer-events-none">
                 <Canvas camera={{ position: [0, 0, 5] }}>
                     <ambientLight intensity={0.5} />
-                    <SpeechBubble anchorPoint={mouthPos} text="કેમ છો?" />
+                    <SpeechBubble anchorPoint={mouthPos} text={bubbleText} />
                 </Canvas>
             </div>
 
